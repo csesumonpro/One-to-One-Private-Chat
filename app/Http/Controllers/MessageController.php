@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Message;
 use Illuminate\Http\Request;
 use App\User;
+use App\Events\MessageSend;
+
 class MessageController extends Controller
 {
     public function __construct()
@@ -45,7 +47,10 @@ class MessageController extends Controller
         'to'=>$request->user_id,
         'type'=>1
     ]);
+       broadcast(new MessageSend($messages));
        return response()->json($messages,201);
+
+
     }
     public function delete_single_message($id=null){
         if(!\Request::ajax()){

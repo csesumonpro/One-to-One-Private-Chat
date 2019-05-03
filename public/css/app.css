@@ -10716,6 +10716,7 @@ a.text-dark:focus {
 .people-list ul li {
   padding-bottom: 20px;
   list-style: none;
+  cursor: pointer;
 }
 
 .people-list img {

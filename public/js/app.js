@@ -1763,6 +1763,8 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -1852,6 +1854,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -1870,11 +1879,20 @@ __webpack_require__.r(__webpack_exports__);
         _this.typing = '';
       }, 2000);
     });
+    Echo.join('liveuser').here(function (users) {
+      _this.users = users;
+    }).joining(function (user) {
+      _this.online = user;
+    }).leaving(function (user) {
+      console.log(user.name);
+    });
   },
   data: function data() {
     return {
       message: '',
-      typing: ''
+      typing: '',
+      users: [],
+      online: ''
     };
   },
   computed: {
@@ -1924,6 +1942,11 @@ __webpack_require__.r(__webpack_exports__);
         'user': authuser,
         'typing': this.message,
         'userId': userId
+      });
+    },
+    onlineUser: function onlineUser(userId) {
+      return lodash__WEBPACK_IMPORTED_MODULE_0___default.a.find(this.users, {
+        'id': userId
       });
     }
   }
@@ -65754,7 +65777,21 @@ var render = function() {
               _c("div", { staticClass: "about" }, [
                 _c("div", { staticClass: "name" }, [_vm._v(_vm._s(user.name))]),
                 _vm._v(" "),
-                _vm._m(1, true)
+                _c(
+                  "div",
+                  { staticClass: "status", staticStyle: { color: "#fff" } },
+                  [
+                    _vm.onlineUser(user.id) || _vm.online.id == user.id
+                      ? _c("div", [
+                          _c("i", { staticClass: "fa fa-circle online" }),
+                          _vm._v(" online\n            ")
+                        ])
+                      : _c("div", [
+                          _c("i", { staticClass: "fa fa-circle" }),
+                          _vm._v(" offline\n            ")
+                        ])
+                  ]
+                )
               ])
             ]
           )
@@ -65972,15 +66009,6 @@ var staticRenderFns = [
       _c("input", { attrs: { type: "text", placeholder: "search" } }),
       _vm._v(" "),
       _c("i", { staticClass: "fa fa-search" })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "status" }, [
-      _c("i", { staticClass: "fa fa-circle online" }),
-      _vm._v(" online\n          ")
     ])
   }
 ]

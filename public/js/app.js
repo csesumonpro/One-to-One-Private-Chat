@@ -1850,6 +1850,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     var _this = this;
@@ -1859,10 +1861,20 @@ __webpack_require__.r(__webpack_exports__);
 
     });
     this.$store.dispatch('userList');
+    Echo["private"]('typingevent').listenForWhisper('typing', function (e) {
+      if (e.user.id == _this.userMessage.user.id && e.userId == authuser.id) {
+        _this.typing = e.user.name;
+      }
+
+      setTimeout(function () {
+        _this.typing = '';
+      }, 2000);
+    });
   },
   data: function data() {
     return {
-      message: ''
+      message: '',
+      typing: ''
     };
   },
   computed: {
@@ -1905,6 +1917,13 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/deleteallmessage/".concat(this.userMessage.user.id)).then(function (response) {
         _this4.selectUser(_this4.userMessage.user.id);
+      });
+    },
+    typeingEvent: function typeingEvent(userId) {
+      Echo["private"]('typingevent').whisper('typing', {
+        'user': authuser,
+        'typing': this.message,
+        'userId': userId
       });
     }
   }
@@ -65881,40 +65900,59 @@ var render = function() {
       ),
       _vm._v(" "),
       _c("div", { staticClass: "chat-message clearfix" }, [
-        _c("textarea", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.message,
-              expression: "message"
-            }
-          ],
-          attrs: {
-            name: "message-to-send",
-            id: "message-to-send",
-            placeholder: "Type your message",
-            rows: "3"
-          },
-          domProps: { value: _vm.message },
-          on: {
-            keydown: function($event) {
-              if (
-                !$event.type.indexOf("key") &&
-                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-              ) {
-                return null
+        _vm.typing
+          ? _c("p", [_vm._v(_vm._s(_vm.typing) + " typing.......")])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.userMessage.user
+          ? _c("textarea", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.message,
+                  expression: "message"
+                }
+              ],
+              attrs: {
+                name: "message-to-send",
+                id: "message-to-send",
+                placeholder: "Type your message",
+                rows: "3"
+              },
+              domProps: { value: _vm.message },
+              on: {
+                keydown: [
+                  function($event) {
+                    return _vm.typeingEvent(_vm.userMessage.user.id)
+                  },
+                  function($event) {
+                    if (
+                      !$event.type.indexOf("key") &&
+                      _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                    ) {
+                      return null
+                    }
+                    return _vm.sendMessage($event)
+                  }
+                ],
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.message = $event.target.value
+                }
               }
-              return _vm.sendMessage($event)
-            },
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+            })
+          : _c("textarea", {
+              attrs: {
+                disabled: "",
+                name: "message-to-send",
+                id: "message-to-send",
+                placeholder: "Type your message",
+                rows: "3"
               }
-              _vm.message = $event.target.value
-            }
-          }
-        }),
+            }),
         _vm._v(" "),
         _c("i", { staticClass: "fa fa-file-o" }),
         _vm._v("    \n      "),

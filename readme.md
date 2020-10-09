@@ -37,5 +37,7 @@
   <li> Run php artisan migrate</li>
   <li> Run npm install</li>
    <li>Run npm run dev</li>
+   <li>Run php artisan websockets:serve</li>
+   <li>Run php artisan serve</li>
 <b>That's it - load the homepage.</b>
 </article>
